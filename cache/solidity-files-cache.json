@@ -1,0 +1,41 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "C:\\Users\\Yumustyology\\workspace\\hifi-pov\\contracts\\HfiPayEscrow.sol": {
+      "lastModificationDate": 1782492883839,
+      "contentHash": "ab6db781b3312b65cc1ea8a88a01f46e",
+      "sourceName": "contracts/HfiPayEscrow.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "HfiPayEscrow"
+      ]
+    }
+  }
+}
