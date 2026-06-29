@@ -101,7 +101,7 @@ export default function Navbar() {
             <button
               onClick={() => setDrawerOpen(true)}
               className={cn(
-                "relative p-2 rounded-lg transition-all duration-200 hidden md:inline-flex",
+                "relative p-2 rounded-lg transition-all duration-200 hidden md:inline-flex cursor-pointer",
                 drawerOpen
                   ? "bg-primary/15 text-primary"
                   : "text-muted-foreground hover:text-foreground hover:bg-white/5"
@@ -148,7 +148,7 @@ export default function Navbar() {
           <button
             onClick={() => setDrawerOpen(true)}
             className={cn(
-              "flex-1 flex flex-col items-center gap-1 py-1 rounded-lg text-xs font-medium transition-all relative",
+              "flex-1 flex flex-col items-center gap-1 py-1 rounded-lg text-xs font-medium transition-all relative cursor-pointer",
               drawerOpen ? "text-primary" : "text-muted-foreground"
             )}
           >
