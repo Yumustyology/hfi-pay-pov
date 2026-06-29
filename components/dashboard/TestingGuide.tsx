@@ -15,11 +15,11 @@ export default function TestingGuide() {
     },
     {
       title: "Send to Any Email",
-      desc: "Send ETH to any email address. All sent funds are locked in the smart contract escrow first.",
+      desc: "Send ETH to any email address (e.g. yumustyology@gmail.com). All sent funds are locked in the smart contract escrow first.",
     },
     {
       title: "Claim or Reverse",
-      desc: "The recipient verifies their email via OTP to claim the locked ETH. If unclaimed, the sender can reverse (refund) the payment.",
+      desc: "The recipient verifies their email via OTP to claim the locked ETH. If unclaimed, the sender can manually trigger a refund to reclaim their funds.",
     },
   ];
 

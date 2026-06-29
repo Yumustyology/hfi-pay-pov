@@ -125,14 +125,14 @@ export default function LandingPage() {
             <Link
               href="/register"
               className="group inline-flex items-center gap-2 px-8 py-4 rounded-xl gradient-brand text-white font-semibold text-base shadow-lg glow-primary hover:opacity-90 transition-all duration-200 hover:scale-[1.02]"
-              id="hero-get-started"
+              id="hero-get-started text-center justify-center"
             >
               Get Started
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl glass border border-white/10 text-foreground font-semibold text-base hover:bg-white/[0.07] transition-all duration-200"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl glass border border-white/10 text-foreground font-semibold text-base hover:bg-white/[0.07] transition-all duration-200 text-center justify-center"
               id="hero-dashboard"
             >
               Go to Dashboard

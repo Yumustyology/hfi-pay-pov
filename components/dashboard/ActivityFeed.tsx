@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { shortenWallet, formatDate } from "@/lib/utils";
 import ResendEmailButton from "./ResendEmailButton";
+import RefundButton from "./RefundButton";
 
 interface Intent {
   _id: string;
@@ -155,9 +156,19 @@ export default function ActivityFeed({ intents, address }: Props) {
                         On-chain
                       </a>
                     )}
-                    {canResend && (
-                      <ResendEmailButton intentId={intent._id} senderWallet={address!} />
-                    )}
+                     {canResend && (
+                       <div className="flex flex-col items-end gap-1.5 mt-1">
+                         <ResendEmailButton intentId={intent._id} senderWallet={address!} />
+                         {intent.contractPaymentId !== undefined && (
+                           <RefundButton 
+                             intent={intent} 
+                             onSuccess={() => {
+                               window.location.reload();
+                             }} 
+                           />
+                         )}
+                       </div>
+                     )}
                     {canClaim && (
                       <Link
                         href={`/receive?id=${intent._id}`}
