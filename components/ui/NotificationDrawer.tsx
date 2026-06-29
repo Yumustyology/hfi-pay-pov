@@ -165,9 +165,12 @@ export default function NotificationDrawer({
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
                 </div>
               ) : preview.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-48 gap-3 text-muted-foreground">
-                  <BellOff className="h-10 w-10 stroke-1" />
-                  <p className="text-sm">No notifications yet</p>
+                <div className="flex flex-col items-center justify-center h-56 gap-2 text-center px-4">
+                  <div className="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center mb-2">
+                    <BellOff className="h-5 w-5 text-muted-foreground/60" />
+                  </div>
+                  <p className="text-sm font-medium text-foreground">No notifications</p>
+                  <p className="text-xs text-muted-foreground">You're all caught up! Alerts will appear here.</p>
                 </div>
               ) : (
                 <div className="space-y-2">

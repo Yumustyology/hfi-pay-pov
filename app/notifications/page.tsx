@@ -164,12 +164,14 @@ export default function NotificationsPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="glass rounded-2xl border border-white/[0.06] p-16 text-center"
+          className="glass rounded-2xl border border-white/[0.06] p-16 text-center flex flex-col items-center"
         >
-          <BellOff className="h-14 w-14 mx-auto text-muted-foreground stroke-1 mb-4" />
+          <div className="w-16 h-16 rounded-3xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center mb-5">
+            <BellOff className="h-7 w-7 text-muted-foreground/60" />
+          </div>
           <h3 className="text-lg font-semibold mb-2">No notifications yet</h3>
           <p className="text-muted-foreground text-sm">
-            Payment updates and alerts will appear here.
+            You're all caught up! Payment updates and alerts will appear here.
           </p>
         </motion.div>
       )}

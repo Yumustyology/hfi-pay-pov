@@ -93,15 +93,21 @@ export default function ActivityFeed({ intents, address }: Props) {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          <AlertCircle className="h-8 w-8 mx-auto stroke-1 mb-2" />
-          <p className="text-sm">
-            {tab === "all" ? (
-              <Link href="/send" className="text-primary hover:underline">Send your first payment</Link>
-            ) : (
-              `No ${tab} transactions`
-            )}
+        <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center mb-4">
+            <AlertCircle className="h-6 w-6 text-muted-foreground/50" />
+          </div>
+          <p className="text-sm font-medium text-foreground mb-1">
+            {tab === "all" ? "No activity yet" : `No ${tab} transactions`}
           </p>
+          <p className="text-xs text-muted-foreground mb-4">
+            {tab === "all" ? "Your transaction history will appear here." : "Try changing the filter."}
+          </p>
+          {tab === "all" && (
+            <Link href="/send" className="px-5 py-2.5 rounded-xl gradient-brand text-white text-xs font-semibold hover:opacity-90 transition-all shadow-lg glow-primary">
+              Send your first payment
+            </Link>
+          )}
         </div>
       ) : (
         <div className="divide-y divide-white/[0.04] max-h-[480px] overflow-y-auto">

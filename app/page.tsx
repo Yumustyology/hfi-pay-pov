@@ -124,8 +124,8 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/register"
-              className="group inline-flex items-center gap-2 px-8 py-4 rounded-xl gradient-brand text-white font-semibold text-base shadow-lg glow-primary hover:opacity-90 transition-all duration-200 hover:scale-[1.02]"
-              id="hero-get-started text-center justify-center"
+              className="group inline-flex items-center gap-2 px-8 py-4 rounded-xl gradient-brand text-white font-semibold text-base shadow-lg glow-primary hover:opacity-90 transition-all duration-200 hover:scale-[1.02] text-center justify-center"
+              id="hero-get-started"
             >
               Get Started
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
