@@ -4,7 +4,7 @@
 export const DEPLOYED_CONTRACTS = {
   // Base Sepolia Testnet (chainId: 84532)
   84532: {
-    escrow: "0x0000000000000000000000000000000000000000" as `0x${string}`,
+    escrow: "0x00C9471ce1E0D425A095e354180E4A3f9f5027E1" as `0x${string}`,
   },
   // Base Mainnet (chainId: 8453) - for future use
   8453: {
