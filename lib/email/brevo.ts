@@ -6,8 +6,24 @@
  */
 
 import { BrevoClient } from "@getbrevo/brevo";
+import { headers } from "next/headers";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+async function getAppUrl(): Promise<string> {
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL;
+  }
+  try {
+    const headersList = await headers();
+    const host = headersList.get("host");
+    if (host) {
+      const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https";
+      return `${protocol}://${host}`;
+    }
+  } catch {
+    // Fallback if called outside a request context (e.g. static rendering / cron)
+  }
+  return "http://localhost:3000";
+}
 
 // Lazily-initialised so module load doesn't crash when key is absent
 let _client: BrevoClient | null = null;
@@ -86,7 +102,8 @@ export async function sendPaymentEmail(
     return { success: false, error: "BREVO_API_KEY not configured" };
   }
 
-  const claimUrl = `${APP_URL}/claim/${params.intentId}`;
+  const appUrl = await getAppUrl();
+  const claimUrl = `${appUrl}/claim/${params.intentId}`;
   const fromEmail = process.env.BREVO_SENDER_EMAIL ?? "noreply@hfipay.demo";
   const fromName = process.env.BREVO_SENDER_NAME ?? "HFI Pay";
 
