@@ -57,18 +57,21 @@ export async function sendOTPEmail(
 
   const fromEmail = process.env.BREVO_SENDER_EMAIL ?? "noreply@hfipay.demo";
   const fromName = process.env.BREVO_SENDER_NAME ?? "HFI Pay";
+  const recipientName = params.name || "HFI Pay User";
 
   try {
     await getClient().transactionalEmails.sendTransacEmail({
       sender: { name: fromName, email: fromEmail },
-      to: [{ email: params.email, name: params.name ?? "" }],
+      to: [{ email: params.email, name: recipientName }],
       subject: `Your HFI Pay verification code: ${params.otp}`,
-      htmlContent: `<p>Hello${params.name ? ` ${params.name}` : ""},</p><p>Your verification code is: <strong>${params.otp}</strong></p>`,
+      htmlContent: buildOtpHtml(params.otp, params.name),
     });
 
+    console.log(`[Brevo] OTP verification email sent to ${params.email}`);
     return { success: true };
   } catch (err: any) {
     const msg = err?.message ?? "Unknown Brevo error";
+    console.error("[Brevo] sendOTPEmail failed:", msg);
     return { success: false, error: msg };
   }
 }
@@ -131,6 +134,56 @@ export async function sendClaimConfirmationEmail(
 }
 
 // ─── HTML Templates ──────────────────────────────────────────────────────────
+
+function buildOtpHtml(otp: string, name?: string): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Verification Code - HFI Pay</title>
+</head>
+<body style="margin:0;padding:0;background:#07070f;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr><td align="center" style="padding:40px 16px;">
+      <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#111121;border-radius:20px;overflow:hidden;border:1px solid #1f1f38;">
+        
+        <!-- Header -->
+        <tr><td style="background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);padding:32px;text-align:center;">
+          <div style="font-size:36px;margin-bottom:8px;">🔐</div>
+          <h1 style="margin:0;color:#fff;font-size:22px;font-weight:800;">Verify Your Identity</h1>
+        </td></tr>
+
+        <!-- Body -->
+        <tr><td style="padding:28px;text-align:center;">
+          <p style="color:#9090b0;font-size:14px;margin:0 0 20px;line-height:1.6;text-align:left;">
+            Hello${name ? ` ${name}` : ""},
+          </p>
+          <p style="color:#9090b0;font-size:14px;margin:0 0 24px;line-height:1.6;text-align:left;">
+            You requested a verification code to link your email address with HFI Pay. Use the code below to complete the verification:
+          </p>
+          
+          <!-- Code Card -->
+          <div style="background:#191932;border:1px solid #2d2d55;border-radius:14px;padding:24px;margin-bottom:24px;display:inline-block;letter-spacing:6px;font-size:36px;font-weight:900;color:#a78bfa;font-family:monospace;">
+            ${otp}
+          </div>
+
+          <p style="color:#555;font-size:12px;margin:0;text-align:left;">
+            This code will expire in 5 minutes. If you did not request this verification, please ignore this email.
+          </p>
+        </td></tr>
+
+        <!-- Footer -->
+        <tr><td style="padding:16px 28px;text-align:center;color:#333;font-size:11px;border-top:1px solid #1a1a30;">
+          HFI Pay PoV · Do not reply.
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
 
 function buildPaymentHtml(
   p: PaymentEmailParams & { claimUrl: string },
