@@ -51,8 +51,10 @@ export default function Navbar() {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 glass border-b border-white/[0.06]",
-        scrolled ? "shadow-xl" : "shadow-none"
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
+        scrolled
+          ? "bg-[rgba(8,8,20,0.75)] backdrop-blur-xl border-b border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+          : "bg-transparent border-b border-transparent"
       )}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
@@ -121,7 +123,9 @@ export default function Navbar() {
       </div>
 
       {/* Mobile nav */}
-      <div className="md:hidden border-t border-white/[0.06] glass px-4 py-2 flex gap-4">
+      <div className="md:hidden border-t border-white/[0.08] bg-[rgba(8,8,20,0.85)] backdrop-blur-2xl px-4 py-2 flex gap-4
+        [background-image:linear-gradient(to_bottom,rgba(79,70,229,0.04),transparent)]
+        shadow-[0_-1px_0_rgba(255,255,255,0.05),0_-8px_32px_rgba(0,0,0,0.4)]">
         {NAV_LINKS.map(({ href, label, icon: Icon }) => {
           const active = pathname === href;
           return (
