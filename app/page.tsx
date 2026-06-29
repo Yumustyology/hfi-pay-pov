@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAccount } from "wagmi";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -73,6 +76,22 @@ const item = {
 };
 
 export default function LandingPage() {
+  const router = useRouter();
+  const { address, status } = useAccount();
+
+  useEffect(() => {
+    if (status === "connected" && address) {
+      fetch(`/api/users/search?walletAddress=${address}`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.success && d.data?.found) {
+            router.push("/dashboard");
+          }
+        })
+        .catch(() => {});
+    }
+  }, [status, address, router]);
+
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       {/* Hero ambient glow */}
