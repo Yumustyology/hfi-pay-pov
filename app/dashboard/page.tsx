@@ -24,6 +24,7 @@ import {
   ArrowRight,
   Copy,
   Check,
+  RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatEth, shortenWallet, formatDate } from "@/lib/utils";
@@ -209,7 +210,60 @@ function QuickSendWidget() {
   );
 }
 
+// ─── Resend Email Button ──────────────────────────────────────────────────────
+
+function ResendEmailButton({ intentId, senderWallet }: { intentId: string; senderWallet: string }) {
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  async function handleResend() {
+    setSending(true);
+    try {
+      const res = await fetch("/api/intents/resend-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ intentId, senderWallet }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error ?? "Failed to resend email");
+      } else {
+        toast.success("Claim email resent successfully!");
+        setSent(true);
+        setTimeout(() => setSent(false), 4000);
+      }
+    } catch {
+      toast.error("Network error — please try again");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <button
+      onClick={handleResend}
+      disabled={sending}
+      title="Resend claim email to recipient"
+      className={`flex items-center justify-end gap-1 text-[10px] transition-colors disabled:opacity-50 ${
+        sent
+          ? "text-emerald-400"
+          : "text-muted-foreground hover:text-violet-400"
+      }`}
+    >
+      {sending ? (
+        <Loader2 className="h-2.5 w-2.5 animate-spin" />
+      ) : sent ? (
+        <Check className="h-2.5 w-2.5" />
+      ) : (
+        <RefreshCw className="h-2.5 w-2.5" />
+      )}
+      {sending ? "Sending…" : sent ? "Sent!" : "Resend email"}
+    </button>
+  );
+}
+
 // ─── Activity Feed ────────────────────────────────────────────────────────────
+
 
 function ActivityFeed({ intents, address }: { intents: Intent[]; address?: string }) {
   const [tab, setTab] = useState<Tab>("all");
@@ -271,6 +325,7 @@ function ActivityFeed({ intents, address }: { intents: Intent[]; address?: strin
               const isSender = intent.senderWallet?.toLowerCase() === address?.toLowerCase();
               const cfg = STATUS_CONFIG[intent.status] ?? STATUS_CONFIG.CREATED;
               const StatusIcon = cfg.icon;
+              const canResend = isSender && ["FUNDED", "EMAIL_SENT", "CREATED"].includes(intent.status);
               return (
                 <motion.div
                   key={intent._id}
@@ -312,6 +367,9 @@ function ActivityFeed({ intents, address }: { intents: Intent[]; address?: strin
                         <ExternalLink className="h-2.5 w-2.5" />
                         On-chain
                       </a>
+                    )}
+                    {canResend && (
+                      <ResendEmailButton intentId={intent._id} senderWallet={address!} />
                     )}
                   </div>
                 </motion.div>
