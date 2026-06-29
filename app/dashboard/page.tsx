@@ -635,7 +635,46 @@ export default function DashboardPage() {
         setProfile(null);
         setShowRegModal(true);
       }
-      if (historyData.success) setIntents(historyData.data.intents ?? []);
+      
+      if (historyData.success) {
+        const loadedIntents = historyData.data.intents ?? [];
+        setIntents(loadedIntents);
+
+        // Background sync: Check if any pending intents are already claimed on-chain
+        const pendingIntents = loadedIntents.filter(
+          (i: Intent) => !["CLAIMED", "REFUNDED"].includes(i.status) && i.contractPaymentId !== undefined && i.contractPaymentId !== null
+        );
+
+        if (pendingIntents.length > 0) {
+          Promise.all(
+            pendingIntents.map(async (intent: Intent) => {
+              try {
+                const checkRes = await fetch(`/api/intents/check-chain?id=${intent.contractPaymentId}`);
+                const checkData = await checkRes.json();
+                if (checkData.success && checkData.data?.claimed) {
+                  // Sync database status to CLAIMED
+                  await fetch("/api/intents/claim", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      reference: intent.reference,
+                      claimantWallet: intent.recipientWallet,
+                    }),
+                  });
+                  // Update local state status to avoid waiting for reload
+                  setIntents((prev) =>
+                    prev.map((p) =>
+                      p._id === intent._id ? { ...p, status: "CLAIMED" } : p
+                    )
+                  );
+                }
+              } catch (e) {
+                console.error("Failed background status sync on dashboard", e);
+              }
+            })
+          ).catch(() => {});
+        }
+      }
     } catch {
       toast.error("Failed to load dashboard data");
     } finally {
