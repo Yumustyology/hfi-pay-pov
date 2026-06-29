@@ -15,6 +15,7 @@ import { generateReference } from "@/lib/reference";
 import { findByWallet, findByEmail } from "@/lib/services/user.service";
 import { createNotifications } from "@/lib/services/notification.service";
 import { sendPaymentEmail, sendClaimConfirmationEmail } from "@/lib/email/brevo";
+import { verifyPaymentTransaction } from "@/lib/blockchain/escrow";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -53,6 +54,21 @@ export async function createIntent(body: {
   const dupe = await Intent.findOne({ txHash });
   if (dupe) return err("Transaction already recorded", 409);
 
+  // ── Extract real contractPaymentId from on-chain receipt ──────────────────
+  // Do NOT trust the client-supplied value (it was always 0).
+  // Parse the PaymentCreated event from the tx logs instead.
+  let resolvedPaymentId: number | null = null;
+  try {
+    const verification = await verifyPaymentTransaction(txHash, recipient.walletAddress);
+    if (verification.valid && verification.contractPaymentId !== undefined) {
+      resolvedPaymentId = verification.contractPaymentId;
+    } else {
+      console.warn("[createIntent] Could not verify tx or extract paymentId:", verification.reason);
+    }
+  } catch (e) {
+    console.error("[createIntent] verifyPaymentTransaction error:", e);
+  }
+
   const reference = generateReference();
 
   const intent = await Intent.create({
@@ -64,7 +80,7 @@ export async function createIntent(body: {
     recipientEmail: recipientEmail.trim().toLowerCase(),
     amount,
     txHash,
-    contractPaymentId: contractPaymentId ?? null,
+    contractPaymentId: resolvedPaymentId,
     status: "FUNDED",
   });
 
