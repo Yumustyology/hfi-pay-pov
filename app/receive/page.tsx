@@ -75,8 +75,33 @@ function ClaimForm() {
           const match = (result.data?.intents ?? []).find(
             (i: Intent) => i._id === intentId || i.reference === intentId
           );
-          if (match) setIntent(match);
-          else setFetchError("Intent not found or you don't have permission.");
+          if (match) {
+            // Check if it is already claimed on-chain but not synced in our DB
+            if (match.status !== "CLAIMED" && match.contractPaymentId !== undefined && match.contractPaymentId !== null) {
+              try {
+                const checkRes = await fetch(`/api/intents/check-chain?id=${match.contractPaymentId}`);
+                const checkData = await checkRes.json();
+                if (checkData.success && checkData.data?.claimed) {
+                  // Sync database status to CLAIMED
+                  await fetch("/api/intents/claim", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      reference: match.reference,
+                      claimantWallet: match.recipientWallet,
+                      syncOnly: true
+                    }),
+                  });
+                  match.status = "CLAIMED";
+                }
+              } catch (err) {
+                console.error("Failed to verify on-chain state on load", err);
+              }
+            }
+            setIntent(match);
+          } else {
+            setFetchError("Intent not found or you don't have permission.");
+          }
         } else {
           setFetchError("Failed to retrieve payment details.");
         }
