@@ -5,10 +5,11 @@ import { redirect } from "next/navigation";
  * Immediately redirects to the receive page with the intent ID as a query param.
  * This gives the email CTA a clean, professional URL: /claim/INTENT_ID
  */
-export default function ClaimRedirectPage({
+export default async function ClaimRedirectPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  redirect(`/receive?id=${params.id}`);
+  const { id } = await params;
+  redirect(`/receive?id=${id}`);
 }
