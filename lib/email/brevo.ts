@@ -246,3 +246,47 @@ function buildClaimHtml(p: ClaimEmailParams): string {
 </body>
 </html>`;
 }
+
+export async function testSendEmail(
+  recipient: string = "yumustyology@gmail.com"
+): Promise<{ success: boolean; error?: string }> {
+  if (!isConfigured()) {
+    console.warn("[Brevo] BREVO_API_KEY not set - skipping test email.");
+    return { success: false, error: "BREVO_API_KEY not configured" };
+  }
+
+  const fromEmail = process.env.BREVO_SENDER_EMAIL ?? "noreply@hfipay.demo";
+  const fromName = process.env.BREVO_SENDER_NAME ?? "HFI Pay";
+
+  try {
+    await getClient().transactionalEmails.sendTransacEmail({
+      sender: { name: fromName, email: fromEmail },
+      to: [{ email: recipient, name: "Test Recipient" }],
+      subject: `🧪 HFI Pay - Brevo Email Test`,
+      htmlContent: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Brevo Email Test</title>
+</head>
+<body style="margin:0;padding:0;background:#07070f;font-family:'Segoe UI',Arial,sans-serif;color:#d0d0e8;padding:40px 16px;">
+  <div style="max-width:560px;margin:0 auto;background:#111121;border-radius:20px;overflow:hidden;border:1px solid #1f1f38;padding:32px;">
+    <h1 style="color:#a78bfa;margin-top:0;">HFI Pay Test Email</h1>
+    <p>Hello,</p>
+    <p>This is a test email sent from HFI Pay using the Brevo transactional email API.</p>
+    <p>If you received this, your Brevo API credentials and configurations are set up and working correctly! 🚀</p>
+    <p style="margin-top:30px;font-size:12px;color:#555;">HFI Pay PoV</p>
+  </div>
+</body>
+</html>`,
+    });
+
+    console.log(`[Brevo] Test email sent → ${recipient}`);
+    return { success: true };
+  } catch (err: any) {
+    const msg = err?.message ?? "Unknown Brevo error";
+    console.error("[Brevo] testSendEmail failed:", msg);
+    return { success: false, error: msg };
+  }
+}
+

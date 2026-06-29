@@ -19,14 +19,9 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // If already registered and visiting /register, send to dashboard
-  if (pathname === "/register" && wallet) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
-
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/register"],
+  matcher: ["/dashboard/:path*"],
 };

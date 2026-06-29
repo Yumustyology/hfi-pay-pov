@@ -29,6 +29,8 @@ export default function RegisterPage() {
         if (d.success && d.data?.found) {
           document.cookie = `hfi_wallet=${address}; path=/; max-age=${30 * 24 * 60 * 60}`;
           router.replace("/dashboard");
+        } else {
+          document.cookie = "hfi_wallet=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
         }
       })
       .catch(() => {})
