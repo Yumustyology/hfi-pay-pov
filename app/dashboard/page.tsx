@@ -24,6 +24,7 @@ import QuickSendWidget from "@/components/dashboard/QuickSendWidget";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
 import RegisterModal from "@/components/dashboard/RegisterModal";
 import NotificationDrawer from "@/components/ui/NotificationDrawer";
+import TestingGuide from "@/components/dashboard/TestingGuide";
 
 interface Intent {
   _id: string;
@@ -320,24 +321,37 @@ export default function DashboardPage() {
         ))}
       </motion.div>
 
-      {/* ── Full transaction history ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35, duration: 0.4 }}
-        className="glass border border-white/[0.07] rounded-2xl p-6"
-      >
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
-              <FileText className="h-4 w-4 text-primary" />
+      {/* ── Transaction History & Testing Guide ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+        {/* Full transaction history */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, duration: 0.4 }}
+          className="lg:col-span-2 glass border border-white/[0.07] rounded-2xl p-6"
+        >
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                <FileText className="h-4 w-4 text-primary" />
+              </div>
+              <h2 className="font-semibold">Transaction History</h2>
             </div>
-            <h2 className="font-semibold">Transaction History</h2>
+            <span className="text-xs text-muted-foreground">{intents.length} total</span>
           </div>
-          <span className="text-xs text-muted-foreground">{intents.length} total</span>
-        </div>
-        <ActivityFeed intents={intents} address={address} />
-      </motion.div>
+          <ActivityFeed intents={intents} address={address} />
+        </motion.div>
+
+        {/* Faucet & testing guide */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.4 }}
+          className="glass border border-white/[0.07] rounded-2xl p-6"
+        >
+          <TestingGuide />
+        </motion.div>
+      </div>
 
       {/* Inline Registration & OTP Verification Modal */}
       <RegisterModal
