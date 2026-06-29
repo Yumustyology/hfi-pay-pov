@@ -58,6 +58,14 @@ export interface ClaimEmailParams {
   txHash: string;
 }
 
+export interface RefundReminderEmailParams {
+  senderEmail: string;
+  senderName: string;
+  recipientEmail: string;
+  amount: string;
+  reference: string;
+}
+
 export interface OtpEmailParams {
   email: string;
   otp: string;
@@ -144,6 +152,32 @@ export async function sendClaimConfirmationEmail(
     });
 
     console.log(`[Brevo] Claim confirmation sent → ${params.senderEmail}`);
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message };
+  }
+}
+
+// ─── Send: Refund Reminder ──────────────────────────────────────────────────
+
+export async function sendRefundReminderEmail(
+  params: RefundReminderEmailParams,
+): Promise<{ success: boolean; error?: string }> {
+  if (!isConfigured())
+    return { success: false, error: "BREVO_API_KEY not configured" };
+
+  const fromEmail = process.env.BREVO_SENDER_EMAIL ?? "noreply@hfipay.demo";
+  const fromName = process.env.BREVO_SENDER_NAME ?? "HFI Pay";
+
+  try {
+    await getClient().transactionalEmails.sendTransacEmail({
+      sender: { name: fromName, email: fromEmail },
+      to: [{ email: params.senderEmail, name: params.senderName }],
+      subject: `↩️ Action Required: Refund available for ${params.amount} ETH`,
+      htmlContent: buildRefundReminderHtml(params),
+    });
+
+    console.log(`[Brevo] Refund reminder sent → ${params.senderEmail}`);
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err?.message };
@@ -306,6 +340,52 @@ function buildClaimHtml(p: ClaimEmailParams): string {
               </td>
             </tr>
           </table>
+        </td></tr>
+        <tr><td style="padding:16px 28px;text-align:center;color:#333;font-size:11px;border-top:1px solid #1a1a30;">
+          HFI Pay PoV · Do not reply.
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
+function buildRefundReminderHtml(p: RefundReminderEmailParams): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><title>Refund Available - HFI Pay</title></head>
+<body style="margin:0;padding:0;background:#07070f;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr><td align="center" style="padding:40px 16px;">
+      <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#111121;border-radius:20px;overflow:hidden;border:1px solid #1f1f38;">
+        <tr><td style="background:linear-gradient(135deg,#d97706 0%,#b45309 100%);padding:32px;text-align:center;">
+          <div style="font-size:36px;margin-bottom:8px;">↩️</div>
+          <h1 style="margin:0;color:#fff;font-size:22px;font-weight:800;">Refund Available</h1>
+        </td></tr>
+        <tr><td style="padding:28px;">
+          <p style="color:#9090b0;font-size:14px;margin:0 0 20px;line-height:1.6;">
+            Hello <strong style="color:#d0d0e8;">${p.senderName}</strong>,<br/><br/>
+            Your payment of <strong style="color:#fbbf24;">${p.amount} ETH</strong> to <strong style="color:#d0d0e8;">${p.recipientEmail}</strong> has been in escrow for over 7 days and remains unclaimed.
+          </p>
+          <p style="color:#9090b0;font-size:14px;margin:0 0 20px;line-height:1.6;">
+            The escrow lock has now expired. You can log into your dashboard and manually refund the ETH back to your wallet.
+          </p>
+          <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;margin-bottom:20px;">
+            <tr style="border-bottom:1px solid #1f1f38;">
+              <td style="padding:10px 0;color:#555;">Reference</td>
+              <td style="padding:10px 0;color:#bbb;font-family:monospace;text-align:right;">${p.reference}</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 0;color:#555;">Amount to refund</td>
+              <td style="padding:10px 0;color:#fbbf24;font-weight:bold;text-align:right;">${p.amount} ETH</td>
+            </tr>
+          </table>
+          <div style="text-align:center;">
+            <a href="https://hfipay.demo/dashboard" style="display:inline-block;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;text-decoration:none;padding:12px 32px;border-radius:10px;font-weight:700;font-size:15px;">
+              Go to Dashboard
+            </a>
+          </div>
         </td></tr>
         <tr><td style="padding:16px 28px;text-align:center;color:#333;font-size:11px;border-top:1px solid #1a1a30;">
           HFI Pay PoV · Do not reply.

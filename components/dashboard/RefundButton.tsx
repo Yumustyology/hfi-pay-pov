@@ -109,7 +109,7 @@ export default function RefundButton({ intent, onSuccess }: Props) {
   return (
     <button
       onClick={handleRefund}
-      disabled={isProcessing}
+      disabled={isProcessing || !isExpired}
       title={
         isExpired 
           ? "Reclaim your unclaimed escrowed funds" 

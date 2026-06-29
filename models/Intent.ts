@@ -15,6 +15,7 @@ export interface IIntentDoc extends Document {
   relayId?: string;
   status: "CREATED" | "FUNDED" | "EMAIL_SENT" | "CLAIMED" | "REFUNDED" | "EXPIRED";
   expiresAt: Date;
+  notifiedExpired?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -42,6 +43,7 @@ const IntentSchema = new Schema<IIntentDoc>(
       type: Date,
       default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     },
+    notifiedExpired: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

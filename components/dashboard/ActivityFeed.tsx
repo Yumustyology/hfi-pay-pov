@@ -41,6 +41,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }>
   EMAIL_SENT: { label: "Notified",  color: "text-violet-400 bg-violet-400/10 border-violet-400/20", icon: Mail },
   CLAIMED:    { label: "Claimed",   color: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20", icon: CheckCircle2 },
   REFUNDED:   { label: "Refunded",  color: "text-amber-400 bg-amber-400/10 border-amber-400/20",  icon: RotateCcw },
+  EXPIRED:    { label: "Expired",   color: "text-rose-400 bg-rose-400/10 border-rose-400/20",     icon: AlertCircle },
 };
 
 interface Props {
