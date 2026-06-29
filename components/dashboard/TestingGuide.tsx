@@ -15,11 +15,11 @@ export default function TestingGuide() {
     },
     {
       title: "Send to Any Email",
-      desc: "Go to the Send page, input any recipient email and amount. The funds will be securely held in escrow.",
+      desc: "Send ETH to any email address. All sent funds are locked in the smart contract escrow first.",
     },
     {
-      title: "Claim via brevo email",
-      desc: "The recipient gets an email with a unique CTA. They log in with their wallet, verify OTP, and claim their ETH instantly.",
+      title: "Claim or Reverse",
+      desc: "The recipient verifies their email via OTP to claim the locked ETH. If unclaimed, the sender can reverse (refund) the payment.",
     },
   ];
 

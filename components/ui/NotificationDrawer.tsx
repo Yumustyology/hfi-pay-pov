@@ -116,11 +116,11 @@ export default function NotificationDrawer({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 28, stiffness: 280 }}
-            className="fixed top-0 right-0 h-full w-full max-w-md z-50 flex flex-col
-              bg-[rgba(8,8,20,0.92)] backdrop-blur-2xl border-l border-white/[0.08] shadow-2xl"
+            className="fixed inset-y-0 right-0 w-full max-w-md z-50 flex flex-col
+              bg-[#080814] border-l border-white/10 shadow-2xl"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg gradient-brand flex items-center justify-center glow-sm">
                   <Bell className="h-4 w-4 text-white" />
@@ -151,7 +151,7 @@ export default function NotificationDrawer({
                 )}
                 <button
                   onClick={onClose}
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/6 transition-all"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -182,8 +182,8 @@ export default function NotificationDrawer({
                         onClick={() => !n.read && markOneRead(n._id)}
                         className={`relative p-3.5 rounded-xl border transition-all duration-200 ${
                           n.read
-                            ? "border-white/[0.05] opacity-60"
-                            : "border-primary/20 bg-primary/[0.04] hover:border-primary/35 cursor-pointer"
+                            ? "border-white/5 opacity-60"
+                            : "border-primary/20 bg-primary/4 hover:border-primary/30 cursor-pointer"
                         }`}
                       >
                         {!n.read && (
@@ -215,15 +215,15 @@ export default function NotificationDrawer({
             </div>
 
             {/* Footer – View All */}
-            <div className="px-4 py-4 border-t border-white/[0.06]">
+            <div className="px-4 py-4 border-t border-white/6">
               <button
                 onClick={() => {
                   onClose();
                   router.push("/notifications");
                 }}
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium
-                  bg-white/[0.04] border border-white/[0.08] text-muted-foreground
-                  hover:text-foreground hover:bg-white/[0.07] transition-all"
+                  bg-white/4 border border-white/8 text-muted-foreground
+                  hover:text-foreground hover:bg-white/6 transition-all"
               >
                 <Bell className="h-4 w-4" />
                 View all notifications
