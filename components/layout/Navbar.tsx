@@ -99,7 +99,7 @@ export default function Navbar() {
             <Link
               href="/notifications"
               className={cn(
-                "relative p-2 rounded-lg transition-all duration-200",
+                "relative p-2 rounded-lg transition-all duration-200 hidden md:inline-flex",
                 pathname === "/notifications"
                   ? "bg-primary/15 text-primary"
                   : "text-muted-foreground hover:text-foreground hover:bg-white/[0.05]"
