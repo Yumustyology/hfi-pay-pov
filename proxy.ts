@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * Middleware — protects /dashboard routes.
+ * Proxy — protects /dashboard routes.
  *
  * After registration the client sets a cookie `hfi_wallet` with the wallet address.
- * The middleware checks for this cookie. The dashboard page does the full DB verification
+ * The proxy checks for this cookie. The dashboard page does the full DB verification
  * on load (wallet → user exists).
  *
  * Cookie is set client-side after successful /api/auth/register response.
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const wallet = request.cookies.get("hfi_wallet")?.value;
 
