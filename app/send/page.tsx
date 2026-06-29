@@ -83,11 +83,15 @@ function SendForm() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txError]);
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isConnected) { toast.error("Connect wallet first"); return; }
-    if (!recipient) { toast.error("Select a verified recipient"); return; }
-    if (!amount || parseFloat(amount) <= 0) { toast.error("Enter a valid amount"); return; }
+    const handleSend = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!isConnected) { toast.error("Connect wallet first"); return; }
+      if (!recipient) { toast.error("Select a verified recipient"); return; }
+      if (address && recipient.walletAddress.toLowerCase() === address.toLowerCase()) {
+        toast.error("You cannot send payments to your own wallet");
+        return;
+      }
+      if (!amount || parseFloat(amount) <= 0) { toast.error("Enter a valid amount"); return; }
 
     clearSteps();
     openPanel(true);
@@ -135,6 +139,7 @@ function SendForm() {
           onChange={setEmail}
           onResolved={setRecipient}
           disabled={isBusy || step === "done"}
+          connectedAddress={address}
         />
 
         {/* Amount */}

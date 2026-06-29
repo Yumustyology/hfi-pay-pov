@@ -14,6 +14,7 @@ interface Props {
   onChange: (value: string) => void;
   onResolved: (recipient: ResolvedRecipient | null) => void;
   disabled?: boolean;
+  connectedAddress?: string;
 }
 
 /**
@@ -23,8 +24,8 @@ interface Props {
  * This is the exact API the production system will expose — today it resolves
  * via MongoDB, later via relay network. The component never changes.
  */
-export default function RecipientLookup({ value, onChange, onResolved, disabled }: Props) {
-  const [status, setStatus] = useState<"idle" | "searching" | "found" | "not_found">("idle");
+export default function RecipientLookup({ value, onChange, onResolved, disabled, connectedAddress }: Props) {
+  const [status, setStatus] = useState<"idle" | "searching" | "found" | "not_found" | "self_send">("idle");
   const [recipient, setRecipient] = useState<ResolvedRecipient | null>(null);
   const [debounced, setDebounced] = useState(value);
 
@@ -55,9 +56,16 @@ export default function RecipientLookup({ value, onChange, onResolved, disabled 
       .then((data) => {
         if (cancelled) return;
         if (data.success && data.data?.found) {
+          const targetWallet = data.data.wallet;
+          if (connectedAddress && targetWallet.toLowerCase() === connectedAddress.toLowerCase()) {
+            setRecipient(null);
+            setStatus("self_send");
+            onResolved(null);
+            return;
+          }
           const r: ResolvedRecipient = {
             displayName: data.data.displayName,
-            walletAddress: data.data.wallet,
+            walletAddress: targetWallet,
             homeRelay: data.data.relayId,
             isVerified: data.data.verified,
           };
@@ -118,6 +126,10 @@ export default function RecipientLookup({ value, onChange, onResolved, disabled 
 
       {status === "not_found" && debounced.includes("@") && (
         <p className="text-xs text-destructive">No HFI Pay account found for this email</p>
+      )}
+
+      {status === "self_send" && (
+        <p className="text-xs text-destructive">You cannot send payments to your own wallet</p>
       )}
     </div>
   );
