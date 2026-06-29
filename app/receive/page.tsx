@@ -99,7 +99,11 @@ function ClaimForm() {
           const res = await fetch("/api/intents/claim", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ reference: intent!.reference, txHash }),
+            body: JSON.stringify({
+              reference: intent!.reference,
+              claimantWallet: address,
+              txHash,
+            }),
           });
           const result = await res.json();
           if (result.success) {
@@ -228,7 +232,37 @@ function ClaimForm() {
     CREATED: "text-sky-400 bg-sky-400/10 border-sky-400/20",
   };
 
-  const canClaim = (intent.status === "FUNDED" || intent.status === "EMAIL_SENT") && walletMatch;
+  const isSender = address?.toLowerCase() === intent.senderWallet?.toLowerCase();
+  const canClaim = (intent.status === "FUNDED" || intent.status === "EMAIL_SENT") && walletMatch && !isSender;
+
+  // Sender landed here — redirect them back with a clear message
+  if (isSender) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="max-w-md w-full glass border border-amber-400/20 rounded-2xl p-8 text-center"
+        >
+          <div className="w-16 h-16 rounded-2xl bg-amber-400/10 mx-auto flex items-center justify-center mb-4">
+            <AlertTriangle className="h-8 w-8 text-amber-400" />
+          </div>
+          <h1 className="text-xl font-bold mb-2">This is your payment</h1>
+          <p className="text-muted-foreground text-sm mb-6">
+            You sent this payment — only the recipient can claim it.
+            You can refund it from your dashboard if needed.
+          </p>
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl glass border border-white/10 text-foreground font-semibold hover:bg-white/[0.06] transition-all"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Link>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 max-w-lg mx-auto">
@@ -294,7 +328,9 @@ function ClaimForm() {
             {/* Amount highlight */}
             <div className="text-center py-4 px-6 rounded-2xl gradient-border glow-primary">
               <div className="bg-card rounded-xl py-5">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">You receive</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">
+                  {walletMatch ? "You receive" : "Amount"}
+                </p>
                 <p className="text-5xl font-bold gradient-text">{intent.amount}</p>
                 <p className="text-muted-foreground text-sm mt-1">ETH on Base Sepolia</p>
               </div>
