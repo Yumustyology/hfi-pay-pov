@@ -60,8 +60,8 @@ export default function ProtocolDebugPanel() {
           px-3 py-2.5 rounded-xl text-xs font-mono font-semibold
           transition-all duration-200 shadow-2xl
           ${isOpen
-            ? "bg-primary text-white glow-sm"
-            : "glass border border-white/[0.12] text-muted-foreground hover:text-foreground hover:border-white/25"
+            ? "bg-primary text-white glow-sm animate-none"
+            : "bg-card border border-white/[0.12] text-muted-foreground hover:text-foreground hover:border-white/25"
           }
         `}
       >
@@ -92,7 +92,7 @@ export default function ProtocolDebugPanel() {
             className="
               fixed bottom-20 right-6 z-50 hidden md:flex flex-col
               w-80 max-h-[520px]
-              glass border border-white/[0.10] rounded-2xl overflow-hidden shadow-2xl
+              bg-card border border-white/[0.10] rounded-2xl overflow-hidden shadow-2xl
             "
           >
             {/* Header */}
