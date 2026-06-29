@@ -18,7 +18,7 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body className="font-sans antialiased bg-background text-foreground min-h-screen flex items-center justify-center px-4 py-16 relative">
         {/* Background Glow */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
