@@ -99,6 +99,7 @@ export default function DashboardPage() {
           preferredChain: profileData.data.preferredChain,
           email: profileData.data.email,
         });
+        setShowRegModal(false);
       } else {
         setProfile(null);
         setShowRegModal(true);
