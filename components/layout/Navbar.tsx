@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Bell, Send, LayoutDashboard, Home, Wallet } from "lucide-react";
+import { Bell, Send, LayoutDashboard, Home } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import NotificationDrawer from "@/components/ui/NotificationDrawer";
 
 const NAV_LINKS = [
   { href: "/", label: "Home", icon: Home },
@@ -19,6 +20,7 @@ export default function Navbar() {
   const { address, isConnected } = useAccount();
   const [unread, setUnread] = useState(0);
   const [scrolled, setScrolled] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -96,13 +98,13 @@ export default function Navbar() {
         {/* Right side */}
         <div className="flex items-center gap-3">
           {isConnected && (
-            <Link
-              href="/notifications"
+            <button
+              onClick={() => setDrawerOpen(true)}
               className={cn(
                 "relative p-2 rounded-lg transition-all duration-200 hidden md:inline-flex",
-                pathname === "/notifications"
+                drawerOpen
                   ? "bg-primary/15 text-primary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/[0.05]"
+                  : "text-muted-foreground hover:text-foreground hover:bg-white/5"
               )}
               aria-label="Notifications"
             >
@@ -112,7 +114,7 @@ export default function Navbar() {
                   {unread > 9 ? "9+" : unread}
                 </span>
               )}
-            </Link>
+            </button>
           )}
           <ConnectButton
             showBalance={false}
@@ -143,11 +145,11 @@ export default function Navbar() {
           );
         })}
         {isConnected && (
-          <Link
-            href="/notifications"
+          <button
+            onClick={() => setDrawerOpen(true)}
             className={cn(
               "flex-1 flex flex-col items-center gap-1 py-1 rounded-lg text-xs font-medium transition-all relative",
-              pathname === "/notifications" ? "text-primary" : "text-muted-foreground"
+              drawerOpen ? "text-primary" : "text-muted-foreground"
             )}
           >
             <Bell className="h-4 w-4" />
@@ -157,9 +159,31 @@ export default function Navbar() {
                 {unread}
               </span>
             )}
-          </Link>
+          </button>
         )}
       </div>
+
+      {/* Shared Notification Drawer */}
+      <NotificationDrawer
+        open={drawerOpen}
+        onClose={() => {
+          setDrawerOpen(false);
+          // Refresh badge count after closing
+          if (address) {
+            fetch(`/api/notifications?walletAddress=${address}`)
+              .then((r) => r.json())
+              .then((d) => {
+                if (d.success) {
+                  setUnread(
+                    (d.data.notifications ?? []).filter((n: any) => !n.read).length
+                  );
+                }
+              })
+              .catch(() => {});
+          }
+        }}
+        address={address}
+      />
     </header>
   );
 }
