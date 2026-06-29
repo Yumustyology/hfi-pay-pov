@@ -30,6 +30,7 @@ import {
   X,
   Info,
   BellOff,
+  Unlock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatEth, shortenWallet, formatDate } from "@/lib/utils";
@@ -331,6 +332,7 @@ function ActivityFeed({ intents, address }: { intents: Intent[]; address?: strin
               const cfg = STATUS_CONFIG[intent.status] ?? STATUS_CONFIG.CREATED;
               const StatusIcon = cfg.icon;
               const canResend = isSender && ["FUNDED", "EMAIL_SENT", "CREATED"].includes(intent.status);
+              const canClaim = !isSender && ["FUNDED", "EMAIL_SENT", "CREATED"].includes(intent.status);
               return (
                 <motion.div
                   key={intent._id}
@@ -375,6 +377,15 @@ function ActivityFeed({ intents, address }: { intents: Intent[]; address?: strin
                     )}
                     {canResend && (
                       <ResendEmailButton intentId={intent._id} senderWallet={address!} />
+                    )}
+                    {canClaim && (
+                      <Link
+                        href={`/receive?id=${intent._id}`}
+                        className="flex items-center justify-end gap-1 text-[10px] font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
+                      >
+                        <Unlock className="h-2.5 w-2.5" />
+                        Claim now
+                      </Link>
                     )}
                   </div>
                 </motion.div>
