@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     if (walletAddress) {
       const resolved = await resolveWallet(walletAddress);
       if (!resolved) return success({ found: false });
-      return success({ found: true, ...resolved });
+      return success({ found: true, ...resolved, email: resolved.user?.email });
     }
 
     if (identifier) {
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
         homeRelay: user.homeRelay,
         preferredChain: user.preferredChain,
         isVerified: user.isVerified,
-        // Do NOT return email for privacy — identifier resolution only returns routing info
+        email: user.email,
       });
     }
 

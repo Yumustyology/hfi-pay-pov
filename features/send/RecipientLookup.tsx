@@ -15,6 +15,7 @@ interface Props {
   onResolved: (recipient: ResolvedRecipient | null) => void;
   disabled?: boolean;
   connectedAddress?: string;
+  connectedEmail?: string;
 }
 
 /**
@@ -24,7 +25,7 @@ interface Props {
  * This is the exact API the production system will expose — today it resolves
  * via MongoDB, later via relay network. The component never changes.
  */
-export default function RecipientLookup({ value, onChange, onResolved, disabled, connectedAddress }: Props) {
+export default function RecipientLookup({ value, onChange, onResolved, disabled, connectedAddress, connectedEmail }: Props) {
   const [status, setStatus] = useState<"idle" | "searching" | "found" | "not_found" | "self_send">("idle");
   const [recipient, setRecipient] = useState<ResolvedRecipient | null>(null);
   const [debounced, setDebounced] = useState(value);
@@ -40,6 +41,13 @@ export default function RecipientLookup({ value, onChange, onResolved, disabled,
     if (!debounced || !debounced.includes("@")) {
       setStatus("idle");
       setRecipient(null);
+      onResolved(null);
+      return;
+    }
+
+    if (connectedEmail && debounced.trim().toLowerCase() === connectedEmail.trim().toLowerCase()) {
+      setRecipient(null);
+      setStatus("self_send");
       onResolved(null);
       return;
     }
@@ -84,7 +92,7 @@ export default function RecipientLookup({ value, onChange, onResolved, disabled,
 
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debounced]);
+  }, [debounced, connectedAddress, connectedEmail]);
 
   return (
     <div className="space-y-2">

@@ -146,7 +146,7 @@ export default function RegisterPage() {
 
         {/* Card */}
         <div className="glass card-shine border border-white/10 rounded-2xl p-6 space-y-4 shadow-2xl backdrop-blur-xl
-          ring-1 ring-white/[0.04] [background:linear-gradient(135deg,rgba(79,70,229,0.05)_0%,rgba(124,58,237,0.03)_100%)]">
+          ring-1 ring-white/4 [background:linear-gradient(135deg,rgba(79,70,229,0.05)_0%,rgba(124,58,237,0.03)_100%)]">
 
           {/* Wallet badge */}
           <div className={`rounded-xl p-3 text-sm flex items-center gap-2 ${
@@ -194,7 +194,7 @@ export default function RegisterPage() {
                 type="submit"
                 disabled={loading || !isConnected}
                 id="send-otp-btn"
-                className="w-full py-3 rounded-xl gradient-brand text-white font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+                className="w-full py-3 rounded-xl gradient-brand text-white font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer hover:opacity-90 transition-opacity"
               >
                 {loading ? "Sending code…" : "Send Verification Code →"}
               </button>
@@ -223,14 +223,14 @@ export default function RegisterPage() {
                 type="submit"
                 disabled={loading || otp.length !== 6}
                 id="verify-create-btn"
-                className="w-full py-3 rounded-xl gradient-brand text-white font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+                className="w-full py-3 rounded-xl gradient-brand text-white font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer hover:opacity-90 transition-opacity"
               >
                 {loading ? "Creating identity…" : "Verify & Create Identity →"}
               </button>
               <button
                 type="button"
                 onClick={() => { setStep("info"); setOtp(""); setError(""); }}
-                className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors py-1"
+                className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors py-1 cursor-pointer"
               >
                 ← Change email or name
               </button>

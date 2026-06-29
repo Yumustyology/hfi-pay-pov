@@ -21,6 +21,20 @@ function SendForm() {
   const { isLoading: isTxConfirming, isSuccess: isTxConfirmed } =
     useWaitForTransactionReceipt({ hash: txHash });
 
+  const [senderProfile, setSenderProfile] = useState<any>(null);
+
+  useEffect(() => {
+    if (!address) return;
+    fetch(`/api/users/search?walletAddress=${address}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.data?.found) {
+          setSenderProfile(d.data);
+        }
+      })
+      .catch(() => {});
+  }, [address]);
+
   // Pre-fill from dashboard Quick Send
   const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [amount, setAmount] = useState(searchParams.get("amount") ?? "");
@@ -140,6 +154,7 @@ function SendForm() {
           onResolved={setRecipient}
           disabled={isBusy || step === "done"}
           connectedAddress={address}
+          connectedEmail={senderProfile?.email}
         />
 
         {/* Amount */}

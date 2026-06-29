@@ -54,6 +54,7 @@ interface UserProfile {
   walletAddress: string;
   homeRelay: string;
   preferredChain: string;
+  email?: string;
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Clock }> = {
@@ -77,13 +78,14 @@ const item = {
 
 // ─── Quick Send Widget ────────────────────────────────────────────────────────
 
-function QuickSendWidget() {
+function QuickSendWidget({ connectedAddress }: { connectedAddress?: string }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [debouncedEmail, setDebouncedEmail] = useState("");
   const [amount, setAmount] = useState("");
   const [searching, setSearching] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [selfSendError, setSelfSendError] = useState(false);
   const [recipient, setRecipient] = useState<{
     displayName: string;
     walletAddress: string;
@@ -108,21 +110,30 @@ function QuickSendWidget() {
         const res = await fetch(`/api/users/search?identifier=${encodeURIComponent(debouncedEmail)}`);
         const result = await res.json();
         if (result.success && result.data?.found) {
-          setRecipient(result.data);
+          const targetWallet = result.data.walletAddress;
+          if (connectedAddress && targetWallet?.toLowerCase() === connectedAddress.toLowerCase()) {
+            setRecipient(null);
+            setSelfSendError(true);
+          } else {
+            setRecipient(result.data);
+            setSelfSendError(false);
+          }
         } else {
           setRecipient(null);
+          setSelfSendError(false);
         }
       } catch {
         setRecipient(null);
+        setSelfSendError(false);
       } finally {
         setSearching(false);
       }
     }
     lookup();
-  }, [debouncedEmail]);
+  }, [debouncedEmail, connectedAddress]);
 
   const handleContinue = () => {
-    if (!recipient || !email) return;
+    if (!recipient || !email || selfSendError) return;
     const params = new URLSearchParams({ email, ...(amount ? { amount } : {}) });
     router.push(`/send?${params.toString()}`);
   };
@@ -172,7 +183,14 @@ function QuickSendWidget() {
               </span>
             </motion.div>
           )}
-          {!searching && searched && !recipient && (
+          {!searching && searched && selfSendError && (
+            <motion.div key="selfsend" initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="flex items-center gap-1.5 text-xs text-destructive">
+              <XCircle className="h-3.5 w-3.5 shrink-0" />
+              You cannot send payments to yourself
+            </motion.div>
+          )}
+          {!searching && searched && !recipient && !selfSendError && (
             <motion.div key="notfound" initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="flex items-center gap-1.5 text-xs text-destructive">
               <XCircle className="h-3 w-3" />
@@ -204,7 +222,7 @@ function QuickSendWidget() {
 
       <button
         onClick={handleContinue}
-        disabled={!recipient}
+        disabled={!recipient || selfSendError}
         id="qs-continue"
         className="w-full py-2.5 rounded-xl gradient-brand text-white text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-all hover:scale-[1.01] disabled:opacity-30 disabled:cursor-not-allowed disabled:scale-100 glow-sm"
       >
@@ -595,11 +613,87 @@ function NotificationDrawer({
   );
 }
 
+// ─── Identity Card Component ──────────────────────────────────────────────────
+
+function IdentityCard({
+  profile,
+  onRegisterClick,
+}: {
+  profile: UserProfile | null;
+  onRegisterClick: () => void;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (!profile?.email) return;
+    navigator.clipboard.writeText(profile.email);
+    setCopied(true);
+    toast.success("Email address copied");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <motion.div variants={item} className="glass border border-white/[0.07] rounded-2xl p-6">
+      <div className="flex items-start justify-between mb-5">
+        <div className="w-10 h-10 rounded-xl bg-violet-400/15 flex items-center justify-center">
+          <ShieldCheck className="h-5 w-5 text-violet-400" />
+        </div>
+        <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium ${
+          profile
+            ? "text-emerald-400 bg-emerald-400/10 border border-emerald-400/20"
+            : "text-muted-foreground bg-white/[0.04] border border-white/[0.06]"
+        }`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${profile ? "bg-emerald-400 pulse-dot" : "bg-muted-foreground"}`} />
+          {profile ? "Verified" : "Unverified"}
+        </span>
+      </div>
+      <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">HFI Identity</p>
+      <p className="text-xl font-bold mb-3">
+        {profile?.displayName ?? <span className="text-muted-foreground text-base font-normal">Not registered</span>}
+      </p>
+      {profile ? (
+        <div className="space-y-2">
+          {profile.email && (
+            <div className="flex items-center justify-between bg-white/[0.03] border border-white/[0.05] rounded-xl px-3 py-1.5 hover:bg-white/[0.05] transition-colors">
+              <span className="text-xs text-muted-foreground font-mono truncate mr-2" title={profile.email}>
+                {profile.email}
+              </span>
+              <button
+                onClick={handleCopy}
+                className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-white/[0.05] cursor-pointer shrink-0"
+                title="Copy email"
+              >
+                {copied ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-400" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+              </button>
+            </div>
+          )}
+          <div className="flex items-center gap-2 text-xs text-muted-foreground pt-1">
+            <Server className="h-3.5 w-3.5 text-primary" />
+            <span>Resolved via <span className="text-primary font-mono">{profile.homeRelay}</span></span>
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={onRegisterClick}
+          className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline cursor-pointer bg-transparent border-none p-0"
+        >
+          <Plus className="h-3 w-3" />
+          Register identity
+        </button>
+      )}
+    </motion.div>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, status } = useAccount();
   const { data: balanceData } = useBalance({ address });
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [intents, setIntents] = useState<Intent[]>([]);
@@ -630,7 +724,13 @@ export default function DashboardPage() {
         historyRes.json(),
       ]);
       if (profileData.success && profileData.data?.found) {
-        setProfile(profileData.data);
+        setProfile({
+          displayName: profileData.data.displayName,
+          walletAddress: profileData.data.walletAddress,
+          homeRelay: profileData.data.homeRelay,
+          preferredChain: profileData.data.preferredChain,
+          email: profileData.data.email,
+        });
       } else {
         setProfile(null);
         setShowRegModal(true);
@@ -683,9 +783,10 @@ export default function DashboardPage() {
   }, [address]);
 
   useEffect(() => {
-    if (!isConnected) { router.push("/"); return; }
+    if (status === "connecting" || status === "reconnecting") return;
+    if (status === "disconnected") { router.push("/"); return; }
     load();
-  }, [isConnected, load, router]);
+  }, [status, load, router]);
 
   // Poll unread count for bell badge
   useEffect(() => {
@@ -810,55 +911,19 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Identity Card */}
-        <motion.div variants={item} className="glass border border-white/[0.07] rounded-2xl p-6">
-          <div className="flex items-start justify-between mb-5">
-            <div className="w-10 h-10 rounded-xl bg-violet-400/15 flex items-center justify-center">
-              <ShieldCheck className="h-5 w-5 text-violet-400" />
-            </div>
-            <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium ${
-              profile
-                ? "text-emerald-400 bg-emerald-400/10 border border-emerald-400/20"
-                : "text-muted-foreground bg-white/[0.04] border border-white/[0.06]"
-            }`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${profile ? "bg-emerald-400 pulse-dot" : "bg-muted-foreground"}`} />
-              {profile ? "Verified" : "Unverified"}
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">HFI Identity</p>
-          <p className="text-xl font-bold mb-3">
-            {profile?.displayName ?? <span className="text-muted-foreground text-base font-normal">Not registered</span>}
-          </p>
-          {profile ? (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Mail className="h-3 w-3 text-emerald-400" />
-                <span>✅ Email identity linked</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Server className="h-3 w-3 text-primary" />
-                <span>Resolved via <span className="text-primary font-mono">{profile.homeRelay}</span></span>
-              </div>
-            </div>
-          ) : (
-            <Link href="/register" className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline">
-              <Plus className="h-3 w-3" />
-              Register identity
-            </Link>
-          )}
-        </motion.div>
+        <IdentityCard profile={profile} onRegisterClick={() => setShowRegModal(true)} />
 
         {/* Quick Send */}
         <motion.div variants={item} className="glass border border-white/[0.07] rounded-2xl p-6">
-          <div className="flex items-center gap-3 mb-5">
-            <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
+          <div className="flex items-start justify-between mb-5">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
               <Send className="h-5 w-5 text-primary" />
             </div>
-            <div>
-              <p className="font-semibold text-sm">Quick Send</p>
-              <p className="text-xs text-muted-foreground">Type email to verify recipient</p>
-            </div>
+            <span className="text-xs px-2.5 py-1 rounded-full glass border border-white/[0.06] text-muted-foreground">
+              Quick Send
+            </span>
           </div>
-          <QuickSendWidget />
+          <QuickSendWidget connectedAddress={address} connectedEmail={profile?.email} />
         </motion.div>
       </motion.div>
 
