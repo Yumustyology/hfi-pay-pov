@@ -9,18 +9,21 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import NotificationDrawer from "@/components/ui/NotificationDrawer";
 
-const NAV_LINKS = [
-  { href: "/", label: "Home", icon: Home },
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/send", label: "Send", icon: Send },
-];
-
 export default function Navbar() {
   const pathname = usePathname();
   const { address, isConnected } = useAccount();
   const [unread, setUnread] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const navLinks = isConnected
+    ? [
+        { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+        { href: "/send", label: "Send", icon: Send },
+      ]
+    : [
+        { href: "/", label: "Home", icon: Home },
+      ];
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -62,7 +65,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         {/* Logo */}
         <Link
-          href="/"
+          href={isConnected ? "/dashboard" : "/"}
           className="flex items-center gap-2 shrink-0 group"
         >
           <div className="w-8 h-8 rounded-lg gradient-brand flex items-center justify-center glow-sm transition-all group-hover:scale-105">
@@ -75,7 +78,7 @@ export default function Navbar() {
 
         {/* Nav links */}
         <nav className="hidden md:flex items-center gap-1">
-          {NAV_LINKS.map(({ href, label, icon: Icon }) => {
+          {navLinks.map(({ href, label, icon: Icon }) => {
             const active = pathname === href;
             return (
               <Link
@@ -128,7 +131,7 @@ export default function Navbar() {
       <div className="md:hidden border-t border-white/[0.08] bg-[rgba(8,8,20,0.85)] backdrop-blur-2xl px-4 py-2 flex gap-4
         [background-image:linear-gradient(to_bottom,rgba(79,70,229,0.04),transparent)]
         shadow-[0_-1px_0_rgba(255,255,255,0.05),0_-8px_32px_rgba(0,0,0,0.4)]">
-        {NAV_LINKS.map(({ href, label, icon: Icon }) => {
+        {navLinks.map(({ href, label, icon: Icon }) => {
           const active = pathname === href;
           return (
             <Link

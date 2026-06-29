@@ -81,14 +81,7 @@ export default function LandingPage() {
 
   useEffect(() => {
     if (status === "connected" && address) {
-      fetch(`/api/users/search?walletAddress=${address}`)
-        .then((r) => r.json())
-        .then((d) => {
-          if (d.success && d.data?.found) {
-            router.push("/dashboard");
-          }
-        })
-        .catch(() => {});
+      router.push("/dashboard");
     }
   }, [status, address, router]);
 
