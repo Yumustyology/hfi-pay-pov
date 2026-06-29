@@ -687,30 +687,14 @@ export default function DashboardPage() {
               : "Your Dashboard"}
           </h1>
         </div>
-        <div className="flex items-center gap-3 self-start sm:self-auto">
-          {/* Notification Bell */}
-          <button
-            onClick={() => setShowNotifDrawer(true)}
-            id="notif-bell-btn"
-            className="relative w-10 h-10 rounded-xl glass border border-white/[0.08] flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all"
-            title="Notifications"
-          >
-            <Bell className="h-4.5 w-4.5" />
-            {unreadNotifCount > 0 && (
-              <span className="absolute -top-1 -right-1 h-4.5 min-w-[18px] px-1 rounded-full bg-primary text-[10px] font-bold text-white flex items-center justify-center">
-                {unreadNotifCount > 9 ? "9+" : unreadNotifCount}
-              </span>
-            )}
-          </button>
-          <Link
-            href="/send"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl gradient-brand text-white font-semibold hover:opacity-90 transition-all hover:scale-[1.02] glow-sm"
-            id="dashboard-send-btn"
-          >
-            <Send className="h-4 w-4" />
-            Send Payment
-          </Link>
-        </div>
+        <Link
+          href="/send"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl gradient-brand text-white font-semibold hover:opacity-90 transition-all hover:scale-[1.02] glow-sm self-start sm:self-auto"
+          id="dashboard-send-btn"
+        >
+          <Send className="h-4 w-4" />
+          Send Payment
+        </Link>
       </motion.div>
 
       {/* Identity warning banner */}
