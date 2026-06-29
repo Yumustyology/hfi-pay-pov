@@ -254,7 +254,7 @@ function ClaimForm() {
           </p>
           <Link
             href="/dashboard"
-            className="inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl glass border border-white/10 text-foreground font-semibold hover:bg-white/[0.06] transition-all"
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl glass border border-white/10 text-foreground font-semibold hover:bg-white/[0.06] transition-all"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Dashboard
