@@ -35,7 +35,7 @@ export default function RootLayout({
         <ProtocolLogProvider>
           <AppProvider>
             <Navbar />
-            <main className="pt-16">
+            <main className="pt-28 md:pt-16">
               {children}
             </main>
             <ProtocolDebugPanel />

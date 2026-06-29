@@ -101,16 +101,24 @@ export default function RegisterPage() {
   // ── Render ───────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-16">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center px-4 py-16 relative overflow-hidden">
+
+      {/* Ambient orbs */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-primary/20 blur-[120px] opacity-60" />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-violet-600/20 blur-[120px] opacity-50" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-indigo-500/10 blur-[80px]" />
+      </div>
+
+      <div className="w-full max-w-md relative z-10">
 
         {/* Header */}
         <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl gradient-brand mb-4">
-            <span className="text-white text-xl font-bold">⬡</span>
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl gradient-brand mb-4 glow-primary shadow-2xl">
+            <span className="text-white text-2xl font-black">Ħ</span>
           </div>
-          <h1 className="text-2xl font-bold">Claim Your HFI Identity</h1>
-          <p className="text-muted-foreground text-sm mt-1">
+          <h1 className="text-3xl font-bold tracking-tight">Claim Your HFI Identity</h1>
+          <p className="text-muted-foreground text-sm mt-2">
             Link your email to your wallet — send and receive crypto by email
           </p>
         </div>
@@ -137,7 +145,8 @@ export default function RegisterPage() {
         </div>
 
         {/* Card */}
-        <div className="glass border border-white/8 rounded-2xl p-6 space-y-4">
+        <div className="glass card-shine border border-white/10 rounded-2xl p-6 space-y-4 shadow-2xl backdrop-blur-xl
+          ring-1 ring-white/[0.04] [background:linear-gradient(135deg,rgba(79,70,229,0.05)_0%,rgba(124,58,237,0.03)_100%)]">
 
           {/* Wallet badge */}
           <div className={`rounded-xl p-3 text-sm flex items-center gap-2 ${
